@@ -34,33 +34,34 @@ const Inventory = () => {
   const { data: products, isError, isLoading } = useGetProductsQuery();
   const [updateProduct] = useUpdateProductMutation();
 
-  const handleCellEditStop: GridEventListener<'cellEditStop'> = async (params, event) => {
-    const { id, field } = params;
-    let newValue = event.target.value;
-
+  const handleCellEditStop: GridEventListener<'cellEditStop'> = async (params) => {
+    const { id, field, value } = params;
+  
+    let newValue = value;
+  
     if (field === "price" || field === "rating" || field === "stockQuantity") {
-      newValue = parseFloat(newValue);
+      newValue = parseFloat(newValue as string);
     }
-
+  
     if (!products) return;
-
+  
     const productToUpdate = products.find((product) => product.productId === id);
-
+  
     if (productToUpdate) {
       const updatedProduct = {
         ...productToUpdate,
         [field]: newValue,
       };
-
+  
       console.log("Updated Product Data:", updatedProduct);
-
+  
       await updateProduct({
         productId: id as string,
         updatedProduct,
       });
     }
   };
-
+  
   if (isLoading) {
     return <div className="py-4">Loading...</div>;
   }
